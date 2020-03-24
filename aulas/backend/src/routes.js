@@ -1,48 +1,35 @@
 const express = require('express');
-// Módulo de criptografia, mas um método pode ser usado para gerar string aleatória
-const crypto = require('crypto');
-// Importa as conexões com o DB
-const connection = require('./database/connection');
+// Importa as funções das rotas de ONGs
+const OngController = require('./controllers/OngController');
+// Importa as funções das rotas de Casos (incidents)
+const IncidentController = require('./controllers/IncidentController');
+// Importa as funções das rotas de uma ONG específica
+const ProfileController = require('./controllers/ProfileController');
+// Importa as funções das rotas de sessões
+const SessionController = require('./controllers/SessionController');
 
 // Desacopla o módulo Router() do express, pra usar apenas como gerenciador de rotas
 const routes = express.Router();
 
+/* ROTAS DE SESSÕES */
+routes.post('/sessions', SessionController.create);
+
+/* ROTAS DE ONGS */
 // Rota para a visualização das ONGs criadas -> method = GET
-routes.get('/ongs', async (request, response) => {
-  // async porque precisamos esperar a query retornar para podermos mostrar os resultados
-
-  // await porque vamos esperar o retorno da query para prosseguir
-  const ongs = await connection('ongs').select('*');
-
-  // A query retorna um array, então só precisamos retorná-lo
-  return response.json(ongs);
-});
-
+routes.get('/ongs', OngController.index);
 // Rota para a criação da ONG -> method = POST
-routes.post('/ongs', async (request, response) => {
-  // Callback é async porque precisamos esperar os dados serem inseridos na tabela para
-  // retornar a resposta
+routes.post('/ongs', OngController.create);
 
-  // Destructuring -> cria variáveis a partir de campos esperados de um objeto
-  const { name, email, whatsapp, city, uf } = request.body;
+/* ROTAS PARA ONGS INDIVIDUAIS (ESPECÍFICAS DE CADA ONG) */
+routes.get('/profile', ProfileController.index);
 
-  // Criar 4 bytes de caracteres e converte para uma string hexadecimal
-  const id = crypto.randomBytes(4).toString('HEX');
-
-  // Insere os dados em uma tabela disponível na nossa conexão (no caso, 'ongs')
-  // await porque precisamos primeiro esperar que essa função termine antes de continuar
-  await connection('ongs').insert({
-    id,
-    name,
-    email,
-    whatsapp,
-    city,
-    uf
-  });
-
-  // Precisa retornar o ID para a ONG poder se conectar na aplicação
-  return response.json({ id });
-});
+/* ROTAS DE CASOS (INCIDENTS) */
+// Rota para a visualização de casos -> method = GET
+routes.get('/incidents', IncidentController.index);
+// Rota para a criação de um caso para uma ONG -> method = POST
+routes.post('/incidents', IncidentController.create);
+// Rota para remover um caso -> method = DELETE
+routes.delete('/incidents/:id', IncidentController.delete);
 
 // Disponibiliza as rotas para serem importadas por outros arquivos
 module.exports = routes;

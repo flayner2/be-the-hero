@@ -1,10 +1,13 @@
 const express = require('express');
+const cors = require('cors');
 // Importa o arquivo de rotas
 // NOTE: precisa ser caminho relativo, se não o JS acha que é modulo de library
 const routes = require('./routes');
-
 // Inicia o express
 const app = express();
+
+// Informa o servidor para usar o módulo de segurança CORS
+app.use(cors());
 
 // Informa o servidor para esperar JSON como o formato do `body` das requests
 app.use(express.json());
