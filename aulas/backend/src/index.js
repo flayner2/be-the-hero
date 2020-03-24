@@ -1,9 +1,16 @@
 const express = require('express');
+// Importa o arquivo de rotas
+// NOTE: precisa ser caminho relativo, se não o JS acha que é modulo de library
+const routes = require('./routes');
 
+// Inicia o express
 const app = express();
 
 // Informa o servidor para esperar JSON como o formato do `body` das requests
 app.use(express.json());
+
+// Informa nosso servidor para usar as rotas importadas do arquivo de rotas
+app.use(routes);
 
 /*
   Rota ('http://google.com/images') / Recurso ('/images')
@@ -26,15 +33,17 @@ app.use(express.json());
   Request Body: Corpo da requisição, utilizado para criar ou alterar recursos (e.g., nome, e-mail para criar um user)
 */
 
-app.post('/users', (request, response) => {
-  const body = request.body;
+/* 
+  Bancos de dados:
 
-  console.log(body);
+  SQL: MySQL, SQLite, PostgreSQL, Oracle, Microsoft SQL Server
+  NoSQL: MongoDB, CouchDB, etc
 
-  return response.json({
-    evento: 'Semana OmniStack 11.0',
-    aluno: 'Maycon'
-  });
-});
+  Driver: SELECT * FROM users
+  Query Builder: table('users').select('*').where(...) -> usa JS, é mais flexível
 
+  Migrations: forma de criar tabelas e manter histórico das criações/alterações
+*/
+
+// Ouve requests na porta 3333 do localhost
 app.listen(3333);
