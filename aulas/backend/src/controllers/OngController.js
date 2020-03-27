@@ -1,7 +1,7 @@
 // Importa as conexões com o DB
 const connection = require('../database/connection');
-// Módulo de criptografia, mas um método pode ser usado para gerar string aleatória
-const crypto = require('crypto');
+// Importa a função de gerar IDs únicos do nosso módulo utils
+const generateUniqueId = require('../utils/generateUniqueId');
 
 // Controllers guardam as funções comuns de cada rota
 module.exports = {
@@ -21,8 +21,7 @@ module.exports = {
     // Destructuring -> cria variáveis a partir de campos esperados de um objeto
     const { name, email, whatsapp, city, uf } = request.body;
 
-    // Criar 4 bytes de caracteres e converte para uma string hexadecimal
-    const id = crypto.randomBytes(4).toString('HEX');
+    const id = generateUniqueId();
 
     // Insere os dados em uma tabela disponível na nossa conexão (no caso, 'ongs')
     // await porque precisamos primeiro esperar que essa função termine antes de continuar

@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+// Importa os errors do celebrate para garantir que a aplicação saiba lidar com erros
+const { errors } = require('celebrate');
 // Importa o arquivo de rotas
 // NOTE: precisa ser caminho relativo, se não o JS acha que é modulo de library
 const routes = require('./routes');
@@ -14,6 +16,9 @@ app.use(express.json());
 
 // Informa nosso servidor para usar as rotas importadas do arquivo de rotas
 app.use(routes);
+
+// Informa nosso servidor para usar o error handling do celebrate
+app.use(errors());
 
 /*
   Rota ('http://google.com/images') / Recurso ('/images')
@@ -48,5 +53,4 @@ app.use(routes);
   Migrations: forma de criar tabelas e manter histórico das criações/alterações
 */
 
-// Ouve requests na porta 3333 do localhost
-app.listen(3333);
+module.exports = app;

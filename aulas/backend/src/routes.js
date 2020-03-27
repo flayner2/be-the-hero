@@ -1,4 +1,6 @@
 const express = require('express');
+// Importa celebrate para validações integradas ao express
+const { celebrate, Segments, Joi } = require('celebrate');
 // Importa as funções das rotas de ONGs
 const OngController = require('./controllers/OngController');
 // Importa as funções das rotas de Casos (incidents)
@@ -18,18 +20,62 @@ routes.post('/sessions', SessionController.create);
 // Rota para a visualização das ONGs criadas -> method = GET
 routes.get('/ongs', OngController.index);
 // Rota para a criação da ONG -> method = POST
-routes.post('/ongs', OngController.create);
+// Validação é feita com celebrate como middleware
+routes.post(
+  '/ongs',
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      name: Joi.string().required(),
+      email: Joi.string()
+        .required()
+        .email(),
+      whatsapp: Joi.string()
+        .required()
+        .min(10)
+        .max(11),
+      city: Joi.string().required(),
+      uf: Joi.string()
+        .required()
+        .length(2)
+    })
+  }),
+  OngController.create
+);
 
 /* ROTAS PARA ONGS INDIVIDUAIS (ESPECÍFICAS DE CADA ONG) */
-routes.get('/profile', ProfileController.index);
+routes.get(
+  '/profile',
+  celebrate({
+    [Segments.HEADERS]: Joi.object({
+      authorization: Joi.string().required()
+    }).unknown()
+  }),
+  ProfileController.index
+);
 
 /* ROTAS DE CASOS (INCIDENTS) */
 // Rota para a visualização de casos -> method = GET
-routes.get('/incidents', IncidentController.index);
+routes.get(
+  '/incidents',
+  celebrate({
+    [Segments.QUERY]: Joi.object().keys({
+      page: Joi.number()
+    })
+  }),
+  IncidentController.index
+);
 // Rota para a criação de um caso para uma ONG -> method = POST
 routes.post('/incidents', IncidentController.create);
 // Rota para remover um caso -> method = DELETE
-routes.delete('/incidents/:id', IncidentController.delete);
+routes.delete(
+  '/incidents/:id',
+  celebrate({
+    [Segments.PARAMS]: Joi.object().keys({
+      id: Joi.number().required()
+    })
+  }),
+  IncidentController.delete
+);
 
 // Disponibiliza as rotas para serem importadas por outros arquivos
 module.exports = routes;
